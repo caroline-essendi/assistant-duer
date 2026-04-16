@@ -5,170 +5,90 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Assistant DUER — Essendi</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --green: #1a3c34;
-    --mint: #4caf8a;
-    --gold: #c9a84c;
-    --light: #f5f7f5;
-    --white: #ffffff;
-    --gray: #e8ede9;
-    --text: #1a2e1e;
-    --muted: #6b7c6e;
-    --red: #c0392b;
-    --orange: #e67e22;
-    --yellow: #f0c040;
-  }
-  body { font-family: 'Segoe UI', sans-serif; background: var(--light); color: var(--text); min-height: 100vh; }
-
-  /* HEADER */
-  header {
-    background: var(--green);
-    color: white;
-    padding: 18px 28px;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.18);
-  }
-  header .logo { font-size: 22px; font-weight: 700; letter-spacing: 1px; color: var(--gold); }
-  header .subtitle { font-size: 13px; color: #b0c4b1; margin-top: 2px; }
-
-  /* TABS */
-  .tabs { display: flex; background: var(--green); padding: 0 28px; border-bottom: 2px solid var(--mint); }
-  .tab {
-    padding: 10px 20px; color: #a0b8a2; cursor: pointer; font-size: 13px; font-weight: 600;
-    border-bottom: 3px solid transparent; transition: all 0.2s; margin-bottom: -2px;
-    text-transform: uppercase; letter-spacing: 0.5px;
-  }
-  .tab:hover { color: white; }
-  .tab.active { color: var(--gold); border-bottom-color: var(--gold); }
-
-  /* PANELS */
-  .panel { display: none; padding: 24px 28px; max-width: 1000px; margin: 0 auto; }
-  .panel.active { display: block; }
-
-  /* UPLOAD ZONE */
-  .upload-zone {
-    border: 2px dashed var(--mint); border-radius: 12px; padding: 40px;
-    text-align: center; cursor: pointer; background: white; transition: all 0.2s;
-  }
-  .upload-zone:hover { background: #edf7f2; border-color: var(--green); }
-  .upload-zone .icon { font-size: 40px; margin-bottom: 12px; }
-  .upload-zone h3 { color: var(--green); font-size: 16px; }
-  .upload-zone p { color: var(--muted); font-size: 13px; margin-top: 6px; }
-  #fileInput { display: none; }
-
-  /* CARDS */
-  .card {
-    background: white; border-radius: 12px; padding: 20px 24px;
-    margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.07);
-    border-left: 4px solid var(--mint);
-  }
-  .card.critical { border-left-color: var(--red); }
-  .card.warning { border-left-color: var(--orange); }
-  .card.ok { border-left-color: var(--mint); }
-  .card h3 { font-size: 15px; color: var(--green); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
-  .card p { font-size: 13px; color: var(--muted); line-height: 1.6; }
-
-  /* BADGES */
-  .badge {
-    display: inline-block; padding: 2px 9px; border-radius: 20px; font-size: 11px; font-weight: 700;
-  }
-  .badge.high { background: #fde8e8; color: var(--red); }
-  .badge.med { background: #fef3e0; color: var(--orange); }
-  .badge.low { background: #e8f5ee; color: #2e7d52; }
-  .badge.na { background: #eee; color: #777; }
-
-  /* RISK TABLE */
-  .risk-table { width: 100%; border-collapse: collapse; font-size: 13px; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
-  .risk-table th { background: var(--green); color: white; padding: 10px 12px; text-align: left; font-size: 12px; }
-  .risk-table td { padding: 9px 12px; border-bottom: 1px solid var(--gray); vertical-align: top; }
-  .risk-table tr:last-child td { border-bottom: none; }
-  .risk-table tr:hover td { background: #f0f7f3; }
-  .score { font-weight: 700; font-size: 15px; }
-  .score.s-high { color: var(--red); }
-  .score.s-med { color: var(--orange); }
-  .score.s-low { color: #2e7d52; }
-
-  /* CHAT */
-  .chat-container { display: flex; flex-direction: column; height: 480px; background: white; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); overflow: hidden; }
-  .chat-messages { flex: 1; overflow-y: auto; padding: 18px; display: flex; flex-direction: column; gap: 12px; }
-  .msg { max-width: 82%; padding: 10px 14px; border-radius: 12px; font-size: 13px; line-height: 1.6; }
-  .msg.user { background: var(--green); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
-  .msg.assistant { background: var(--gray); color: var(--text); align-self: flex-start; border-bottom-left-radius: 4px; }
-  .msg.assistant strong { color: var(--green); }
-  .chat-input-row { display: flex; gap: 8px; padding: 12px 16px; border-top: 1px solid var(--gray); }
-  .chat-input-row input {
-    flex: 1; border: 1px solid var(--gray); border-radius: 8px; padding: 9px 14px; font-size: 13px; outline: none;
-    transition: border 0.2s;
-  }
-  .chat-input-row input:focus { border-color: var(--mint); }
-  .chat-input-row button {
-    background: var(--green); color: white; border: none; border-radius: 8px;
-    padding: 9px 18px; cursor: pointer; font-size: 13px; font-weight: 600; transition: background 0.2s;
-  }
-  .chat-input-row button:hover { background: var(--mint); }
-  .chat-input-row button:disabled { background: #aaa; cursor: not-allowed; }
-  .typing { font-style: italic; color: var(--muted); font-size: 12px; }
-
-  /* ACTIONS */
-  .action-row {
-    display: flex; align-items: flex-start; gap: 14px; padding: 14px 0;
-    border-bottom: 1px solid var(--gray);
-  }
-  .action-row:last-child { border-bottom: none; }
-  .action-num { width: 28px; height: 28px; border-radius: 50%; background: var(--green); color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; margin-top: 2px; }
-  .action-content h4 { font-size: 14px; color: var(--green); }
-  .action-content p { font-size: 12px; color: var(--muted); margin-top: 3px; }
-  .action-meta { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
-  .tag { font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
-  .tag.simple { background: #e8f5ee; color: #2e7d52; }
-  .tag.moyen { background: #fef3e0; color: var(--orange); }
-  .tag.complex { background: #fde8e8; color: var(--red); }
-  .tag.cse { background: #eee; color: #555; }
-  .tag.zone { background: #e8eef7; color: #3a5a99; }
-
-  /* SUMMARY GRID */
-  .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px; }
-  .sum-card { background: white; border-radius: 10px; padding: 16px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
-  .sum-card .num { font-size: 28px; font-weight: 800; color: var(--green); }
-  .sum-card .num.red { color: var(--red); }
-  .sum-card .num.orange { color: var(--orange); }
-  .sum-card .num.gold { color: var(--gold); }
-  .sum-card .label { font-size: 11px; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.4px; }
-
-  /* BUTTONS */
-  .btn { padding: 9px 20px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; border: none; transition: all 0.2s; }
-  .btn-primary { background: var(--green); color: white; }
-  .btn-primary:hover { background: var(--mint); }
-  .btn-outline { background: transparent; border: 1.5px solid var(--green); color: var(--green); }
-  .btn-outline:hover { background: var(--green); color: white; }
-
-  /* QUICK CHIPS */
-  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
-  .chip {
-    padding: 5px 12px; border-radius: 20px; font-size: 12px; cursor: pointer;
-    background: var(--gray); color: var(--text); border: 1px solid transparent;
-    transition: all 0.15s;
-  }
-  .chip:hover { background: var(--mint); color: white; border-color: var(--mint); }
-
-  /* ALERT BOX */
-  .alert { background: #fff8e1; border: 1px solid var(--gold); border-radius: 10px; padding: 14px 18px; margin-bottom: 16px; font-size: 13px; color: #7a5c00; }
-  .alert strong { color: #5a4000; }
-
-  /* SECTION TITLE */
-  .section-title { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); font-weight: 700; margin: 20px 0 10px; }
-
-  .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid #ccc; border-top-color: var(--mint); border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  .hidden { display: none !important; }
-  .progress-bar-wrap { background: var(--gray); border-radius: 20px; height: 6px; margin-top: 4px; }
-  .progress-bar { background: var(--mint); height: 6px; border-radius: 20px; transition: width 0.5s; }
-  .progress-bar.danger { background: var(--red); }
-  .progress-bar.warn { background: var(--orange); }
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--green:#1a3c34;--mint:#4caf8a;--gold:#c9a84c;--light:#f5f7f5;--white:#fff;--gray:#e8ede9;--text:#1a2e1e;--muted:#6b7c6e;--red:#c0392b;--orange:#e67e22}
+body{font-family:'Segoe UI',sans-serif;background:var(--light);color:var(--text);min-height:100vh}
+header{background:var(--green);color:#fff;padding:18px 28px;display:flex;align-items:center;gap:14px;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.logo{font-size:22px;font-weight:700;letter-spacing:1px;color:var(--gold)}
+.subtitle{font-size:13px;color:#b0c4b1;margin-top:2px}
+.tabs{display:flex;background:var(--green);padding:0 28px;border-bottom:2px solid var(--mint)}
+.tab{padding:10px 20px;color:#a0b8a2;cursor:pointer;font-size:13px;font-weight:600;border-bottom:3px solid transparent;transition:all .2s;margin-bottom:-2px;text-transform:uppercase;letter-spacing:.5px}
+.tab:hover{color:#fff}
+.tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+.panel{display:none;padding:24px 28px;max-width:1000px;margin:0 auto}
+.panel.active{display:block}
+.upload-zone{border:2px dashed var(--mint);border-radius:12px;padding:40px;text-align:center;cursor:pointer;background:#fff;transition:all .2s}
+.upload-zone:hover{background:#edf7f2;border-color:var(--green)}
+.upload-zone .icon{font-size:40px;margin-bottom:12px}
+.upload-zone h3{color:var(--green);font-size:16px}
+.upload-zone p{color:var(--muted);font-size:13px;margin-top:6px}
+#fileInput{display:none}
+.card{background:#fff;border-radius:12px;padding:20px 24px;margin-bottom:16px;box-shadow:0 1px 4px rgba(0,0,0,.07);border-left:4px solid var(--mint)}
+.card.critical{border-left-color:var(--red)}
+.card.warning{border-left-color:var(--orange)}
+.card.ok{border-left-color:var(--mint)}
+.card h3{font-size:15px;color:var(--green);margin-bottom:8px}
+.card p{font-size:13px;color:var(--muted);line-height:1.6}
+.badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700}
+.badge.high{background:#fde8e8;color:var(--red)}
+.badge.med{background:#fef3e0;color:var(--orange)}
+.badge.low{background:#e8f5ee;color:#2e7d52}
+.risk-table{width:100%;border-collapse:collapse;font-size:13px;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.risk-table th{background:var(--green);color:#fff;padding:10px 12px;text-align:left;font-size:12px}
+.risk-table td{padding:9px 12px;border-bottom:1px solid var(--gray);vertical-align:top}
+.risk-table tr:last-child td{border-bottom:none}
+.risk-table tr:hover td{background:#f0f7f3}
+.score{font-weight:700;font-size:15px}
+.score.s-high{color:var(--red)}
+.score.s-med{color:var(--orange)}
+.score.s-low{color:#2e7d52}
+.chat-container{display:flex;flex-direction:column;height:480px;background:#fff;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,.07);overflow:hidden}
+.chat-messages{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:12px}
+.msg{max-width:82%;padding:10px 14px;border-radius:12px;font-size:13px;line-height:1.6}
+.msg.user{background:var(--green);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.msg.assistant{background:var(--gray);color:var(--text);align-self:flex-start;border-bottom-left-radius:4px}
+.chat-input-row{display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--gray)}
+.chat-input-row input{flex:1;border:1px solid var(--gray);border-radius:8px;padding:9px 14px;font-size:13px;outline:none;transition:border .2s}
+.chat-input-row input:focus{border-color:var(--mint)}
+.chat-input-row button{background:var(--green);color:#fff;border:none;border-radius:8px;padding:9px 18px;cursor:pointer;font-size:13px;font-weight:600;transition:background .2s}
+.chat-input-row button:hover{background:var(--mint)}
+.chat-input-row button:disabled{background:#aaa;cursor:not-allowed}
+.action-row{display:flex;align-items:flex-start;gap:14px;padding:14px 0;border-bottom:1px solid var(--gray)}
+.action-row:last-child{border-bottom:none}
+.action-num{width:28px;height:28px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;margin-top:2px}
+.action-content h4{font-size:14px;color:var(--green)}
+.action-content p{font-size:12px;color:var(--muted);margin-top:3px}
+.action-meta{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.tag{font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600}
+.tag.simple{background:#e8f5ee;color:#2e7d52}
+.tag.moyen{background:#fef3e0;color:var(--orange)}
+.tag.complex{background:#fde8e8;color:var(--red)}
+.tag.cse{background:#eee;color:#555}
+.tag.zone{background:#e8eef7;color:#3a5a99}
+.summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.sum-card{background:#fff;border-radius:10px;padding:16px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.sum-card .num{font-size:28px;font-weight:800;color:var(--green)}
+.sum-card .num.red{color:var(--red)}
+.sum-card .num.orange{color:var(--orange)}
+.sum-card .num.gold{color:var(--gold)}
+.sum-card .label{font-size:11px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.4px}
+.btn{padding:9px 20px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;border:none;transition:all .2s}
+.btn-primary{background:var(--green);color:#fff}
+.btn-primary:hover{background:var(--mint)}
+.btn-outline{background:transparent;border:1.5px solid var(--green);color:var(--green)}
+.btn-outline:hover{background:var(--green);color:#fff}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.chip{padding:5px 12px;border-radius:20px;font-size:12px;cursor:pointer;background:var(--gray);color:var(--text);border:1px solid transparent;transition:all .15s}
+.chip:hover{background:var(--mint);color:#fff}
+.alert{background:#fff8e1;border:1px solid var(--gold);border-radius:10px;padding:14px 18px;margin-bottom:16px;font-size:13px;color:#7a5c00}
+.section-title{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700;margin:20px 0 10px}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid #ccc;border-top-color:var(--mint);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hidden{display:none!important}
+.progress-bar-wrap{background:var(--gray);border-radius:20px;height:6px;margin-top:4px}
+.progress-bar{background:var(--mint);height:6px;border-radius:20px}
+.progress-bar.danger{background:var(--red)}
+.progress-bar.warn{background:var(--orange)}
 </style>
 </head>
 <body>
@@ -176,78 +96,60 @@
 <header>
   <div>
     <div class="logo">🏨 Assistant DUER</div>
-    <div class="subtitle">Essendi — Évaluation & Prévention des risques professionnels</div>
+    <div class="subtitle">Essendi — Évaluation &amp; Prévention des risques professionnels</div>
   </div>
 </header>
 
 <div class="tabs">
-  <div class="tab active" onclick="showTab('upload')">📁 Importer</div>
-  <div class="tab" onclick="showTab('analyse')" id="tab-analyse">📊 Analyse</div>
-  <div class="tab" onclick="showTab('chat')" id="tab-chat">💬 Assistant</div>
-  <div class="tab" onclick="showTab('actions')" id="tab-actions">📋 Plan d'actions</div>
+  <div class="tab active" id="t-upload" onclick="showTab('upload')">📁 Importer</div>
+  <div class="tab" id="t-analyse" onclick="showTab('analyse')">📊 Analyse</div>
+  <div class="tab" id="t-chat" onclick="showTab('chat')">💬 Assistant</div>
+  <div class="tab" id="t-actions" onclick="showTab('actions')">📋 Plan d'actions</div>
 </div>
 
-<!-- PANEL 1 : UPLOAD -->
+<!-- PANEL UPLOAD -->
 <div class="panel active" id="panel-upload">
   <div class="section-title">Étape 1 — Importer votre DUER</div>
-  <div class="alert">
-    <strong>Comment ça marche ?</strong> Exportez votre DUER depuis PREVISOFT (module Évaluation des risques → Export PDF), puis déposez-le ici. L'IA l'analyse automatiquement et produit un diagnostic complet.
-  </div>
-
+  <div class="alert"><strong>Comment ça marche ?</strong> Exportez votre DUER depuis PREVISOFT (module Évaluation des risques → Export PDF), puis déposez-le ici.</div>
   <div class="upload-zone" onclick="document.getElementById('fileInput').click()" id="uploadZone">
     <div class="icon">📄</div>
     <h3>Déposer votre DUER (PDF)</h3>
     <p>Cliquez ou glissez-déposez votre export PREVISOFT</p>
   </div>
   <input type="file" id="fileInput" accept=".pdf" onchange="handleFile(event)">
-
-  <div id="loadingMsg" class="hidden" style="margin-top:20px; text-align:center; color:var(--muted); font-size:14px;">
-    <span class="spinner"></span> Analyse en cours... l'IA lit votre DUER et prépare le diagnostic.
+  <div id="loadingMsg" class="hidden" style="margin-top:20px;text-align:center;color:var(--muted);font-size:14px;">
+    <span class="spinner"></span> Analyse en cours...
   </div>
-
-  <div style="margin-top:24px; text-align:center;">
-    <p style="font-size:13px; color:var(--muted); margin-bottom:12px;">Ou tester avec le DUER de démonstration :</p>
-    <button class="btn btn-outline" onclick="loadDemo()">📋 Charger le DUER demo (Ibis Marseille)</button>
+  <div style="margin-top:24px;text-align:center;">
+    <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Ou tester avec le DUER de démonstration :</p>
+    <button class="btn btn-outline" onclick="loadDemo()">📋 Charger le DUER démo (Ibis Marseille)</button>
   </div>
 </div>
 
-<!-- PANEL 2 : ANALYSE -->
+<!-- PANEL ANALYSE -->
 <div class="panel" id="panel-analyse">
-  <div class="section-title">Diagnostic — <span id="hotelName">Ibis Marseille Gare Saint-Charles</span></div>
-
+  <div class="section-title">Diagnostic — Ibis Marseille Gare Saint-Charles</div>
   <div class="summary-grid">
-    <div class="sum-card">
-      <div class="num" id="sumUnits">17</div>
-      <div class="label">Unités de travail</div>
-    </div>
-    <div class="sum-card">
-      <div class="num red" id="sumHigh">12</div>
-      <div class="label">Risques ≥ 8 (prioritaires)</div>
-    </div>
-    <div class="sum-card">
-      <div class="num orange" id="sumPending">4</div>
-      <div class="label">Actions en attente</div>
-    </div>
-    <div class="sum-card">
-      <div class="num gold" id="sumDate">Mars 2026</div>
-      <div class="label">Dernière mise à jour</div>
-    </div>
+    <div class="sum-card"><div class="num">17</div><div class="label">Unités de travail</div></div>
+    <div class="sum-card"><div class="num red">14</div><div class="label">Risques ≥ 8 (prioritaires)</div></div>
+    <div class="sum-card"><div class="num orange">3</div><div class="label">Actions en retard</div></div>
+    <div class="sum-card"><div class="num gold">Mars 2026</div><div class="label">Dernière mise à jour</div></div>
   </div>
 
   <div class="card critical">
     <h3>🔴 Point de vigilance majeur — RPS</h3>
-    <p>Cet établissement présente une situation RPS critique documentée dans le DUER (Risques Généraux, risque n°8, coté <strong>8/10</strong>). Un accompagnement par cabinet I3R (ARCANOVA) est en cours (10% d'avancement, échéance mai 2026). Le plan d'actions RPS engage <strong>Caroline De Andrade</strong> comme pilote. Ce risque doit rester en tête de suivi.</p>
+    <p>Situation RPS critique documentée (Risques Généraux n°8, coté <strong>8/10</strong>). Accompagnement ARCANOVA (I3R) en cours — 10% d'avancement, échéance mai 2026. Pilote : <strong>Caroline De Andrade</strong>.</p>
   </div>
 
   <div class="card warning">
-    <h3>⚠️ Actions en retard ou non démarrées</h3>
-    <p>3 achats de chaussures de sécurité (Bar, Réception, Restaurant — pilote : Régis Koch, échéance 31/03/2026) affichent <strong>0% d'avancement</strong>. À relancer en priorité immédiate.</p>
-    <div style="margin-top:10px;">
-      <div style="font-size:12px; color:var(--muted); margin-bottom:4px;">Bar — chaussures sécurité (200€)</div>
+    <h3>⚠️ Actions en retard (0% d'avancement)</h3>
+    <p>3 achats de chaussures de sécurité — pilote Régis Koch, échéance 31/03/2026 <strong>dépassée</strong>.</p>
+    <div style="margin-top:10px">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:4px">Bar — chaussures sécurité (200€)</div>
       <div class="progress-bar-wrap"><div class="progress-bar danger" style="width:0%"></div></div>
-      <div style="font-size:12px; color:var(--muted); margin: 6px 0 4px;">Réception — chaussures sécurité (400€)</div>
+      <div style="font-size:12px;color:var(--muted);margin:6px 0 4px">Réception — chaussures sécurité (400€)</div>
       <div class="progress-bar-wrap"><div class="progress-bar danger" style="width:0%"></div></div>
-      <div style="font-size:12px; color:var(--muted); margin: 6px 0 4px;">Restaurant — chaussures sécurité (300€)</div>
+      <div style="font-size:12px;color:var(--muted);margin:6px 0 4px">Restaurant — chaussures sécurité (300€)</div>
       <div class="progress-bar-wrap"><div class="progress-bar danger" style="width:0%"></div></div>
     </div>
   </div>
@@ -255,31 +157,36 @@
   <div class="section-title">Risques prioritaires par unité (cotation ≥ 8)</div>
   <table class="risk-table">
     <thead>
-      <tr>
-        <th>Unité de travail</th>
-        <th>Risque</th>
-        <th>Score résiduel</th>
-        <th>Niveau</th>
-        <th>Préconisation</th>
-      </tr>
+      <tr><th>Unité de travail</th><th>Risque</th><th>Score</th><th>Niveau</th></tr>
     </thead>
-    <tbody id="riskTableBody">
+    <tbody>
+      <tr><td><strong>Parking / Garage</strong></td><td>Chute de plain pied (passage étroit)</td><td><span class="score s-high">8</span></td><td><span class="badge high">Prioritaire</span></td></tr>
+      <tr><td><strong>Parking / Garage</strong></td><td>Incendie / Explosion</td><td><span class="score s-high">8</span></td><td><span class="badge high">Prioritaire</span></td></tr>
+      <tr><td><strong>Bar</strong></td><td>Incendie / Explosion</td><td><span class="score s-high">8</span></td><td><span class="badge high">Prioritaire</span></td></tr>
+      <tr><td><strong>Cafétéria - PDJ</strong></td><td>Incendie / Explosion</td><td><span class="score s-high">8</span></td><td><span class="badge high">Prioritaire</span></td></tr>
+      <tr><td><strong>Cuisine</strong></td><td>Incendie / Explosion</td><td><span class="score s-high">8</span></td><td><span class="badge high">Prioritaire</span></td></tr>
+      <tr><td><strong>Économat / Livraison</strong></td><td>Incendie / Explosion</td><td><span class="score s-high">8</span></td><td><span class="badge high">Prioritaire</span></td></tr>
+      <tr><td><strong>Plonge</strong></td><td>Incendie / Explosion</td><td><span class="score s-high">8</span></td><td><span class="badge high">Prioritaire</span></td></tr>
+      <tr><td><strong>Plonge</strong></td><td>Risque Psychosocial (RPS)</td><td><span class="score s-high">8</span></td><td><span class="badge high">Prioritaire</span></td></tr>
+      <tr><td><strong>Réception clientèle</strong></td><td>Incendie / Explosion</td><td><span class="score s-high">8</span></td><td><span class="badge high">Prioritaire</span></td></tr>
+      <tr><td><strong>Salle de restaurant</strong></td><td>Incendie / Explosion</td><td><span class="score s-high">8</span></td><td><span class="badge high">Prioritaire</span></td></tr>
+      <tr><td><strong>Salle de restaurant</strong></td><td>Électricité (fils non protégés)</td><td><span class="score s-high">8</span></td><td><span class="badge high">Prioritaire</span></td></tr>
+      <tr><td><strong>Risques Généraux</strong></td><td>RPS — Dysfonctionnements organisationnels</td><td><span class="score s-high">8</span></td><td><span class="badge high">Prioritaire</span></td></tr>
+      <tr><td><strong>Service Technique</strong></td><td>Risque biologique (piqûres / coupures)</td><td><span class="score s-high">8</span></td><td><span class="badge high">Prioritaire</span></td></tr>
+      <tr><td><strong>Service Technique</strong></td><td>Électricité (intervention circuit / armoire)</td><td><span class="score s-high">8</span></td><td><span class="badge high">Prioritaire</span></td></tr>
     </tbody>
   </table>
 
-  <div class="section-title" style="margin-top:24px;">Vue globale par famille de risques</div>
-  <div id="riskFamilies"></div>
-
-  <div style="margin-top:20px; display:flex; gap:10px;">
-    <button class="btn btn-primary" onclick="showTab('chat')">💬 Poser une question à l'assistant</button>
+  <div style="margin-top:20px;display:flex;gap:10px">
+    <button class="btn btn-primary" onclick="showTab('chat')">💬 Poser une question</button>
     <button class="btn btn-outline" onclick="showTab('actions')">📋 Voir le plan d'actions</button>
   </div>
 </div>
 
-<!-- PANEL 3 : CHAT -->
+<!-- PANEL CHAT -->
 <div class="panel" id="panel-chat">
   <div class="section-title">Assistant IA — Posez vos questions sur votre DUER</div>
-  <div class="chips" id="chipList">
+  <div class="chips">
     <span class="chip" onclick="sendChip(this)">Quels sont mes risques les plus graves ?</span>
     <span class="chip" onclick="sendChip(this)">Comment réduire les TMS en cuisine ?</span>
     <span class="chip" onclick="sendChip(this)">Mes actions en retard sont-elles une infraction ?</span>
@@ -291,265 +198,178 @@
   <div class="chat-container">
     <div class="chat-messages" id="chatMessages">
       <div class="msg assistant">
-        Bonjour ! Je suis votre assistant DUER, spécialisé en prévention des risques en hôtellerie.<br><br>
-        J'ai analysé votre DUER de l'<strong>Ibis Marseille Gare Saint-Charles</strong>. Vous pouvez me poser des questions sur vos risques, vos obligations légales, ou me demander des conseils concrets pour améliorer vos conditions de travail. 👆 Utilisez les raccourcis ci-dessus ou posez votre question librement.
+        Bonjour ! Je suis votre assistant DUER, spécialisé en prévention des risques en hôtellerie-restauration.<br><br>
+        J'ai analysé le DUER de l'<strong>Ibis Marseille Gare Saint-Charles</strong>. Posez-moi vos questions sur vos risques, vos obligations légales ou les actions à mener. 👆 Utilisez les raccourcis ou écrivez librement.
       </div>
     </div>
     <div class="chat-input-row">
-      <input type="text" id="chatInput" placeholder="Ex : Comment gérer le risque incendie en cuisine ?" onkeydown="if(event.key==='Enter') sendMessage()">
+      <input type="text" id="chatInput" placeholder="Ex : Comment gérer le risque incendie en cuisine ?" onkeydown="if(event.key==='Enter')sendMessage()">
       <button onclick="sendMessage()" id="sendBtn">Envoyer</button>
     </div>
   </div>
 </div>
 
-<!-- PANEL 4 : ACTIONS -->
+<!-- PANEL ACTIONS -->
 <div class="panel" id="panel-actions">
-  <div class="section-title">Plan d'actions priorisé — <span id="hotelNameActions">Ibis Marseille Gare Saint-Charles</span></div>
-
-  <div class="alert">
-    <strong>Budget total identifié :</strong> 12 300 € — dont 6 000 € pour l'accompagnement RPS (ARCANOVA) et 900 € pour les EPI (chaussures). Ces actions sont à piloter dans PREVISOFT sous "Plans d'action".
-  </div>
+  <div class="section-title">Plan d'actions priorisé — Ibis Marseille Gare Saint-Charles</div>
+  <div class="alert"><strong>Budget total identifié :</strong> 12 300 € — dont 6 000 € accompagnement RPS (ARCANOVA) et 900 € EPI (chaussures).</div>
 
   <div class="card critical">
-    <h3>🔴 IMMÉDIAT — Actions en retard (échéance dépassée ou 0%)</h3>
-    <div id="actionsImmediat"></div>
+    <h3>🔴 IMMÉDIAT — Actions en retard</h3>
+    <div class="action-row">
+      <div class="action-num">1</div>
+      <div class="action-content">
+        <h4>Achat chaussures de sécurité — Bar (200€)</h4>
+        <p>Pilote : Régis Koch | Échéance 31/03/2026 dépassée | 0% d'avancement</p>
+        <div class="action-meta"><span class="tag simple">Action simple</span><span class="tag zone">📍 Bar</span></div>
+      </div>
+    </div>
+    <div class="action-row">
+      <div class="action-num">2</div>
+      <div class="action-content">
+        <h4>Achat chaussures de sécurité — Réception (400€)</h4>
+        <p>Pilote : Régis Koch | Échéance 31/03/2026 dépassée | 0% d'avancement</p>
+        <div class="action-meta"><span class="tag simple">Action simple</span><span class="tag zone">📍 Réception</span></div>
+      </div>
+    </div>
+    <div class="action-row">
+      <div class="action-num">3</div>
+      <div class="action-content">
+        <h4>Achat chaussures de sécurité — Restaurant (300€)</h4>
+        <p>Pilote : Régis Koch | Échéance 31/03/2026 dépassée | 0% d'avancement</p>
+        <div class="action-meta"><span class="tag simple">Action simple</span><span class="tag zone">📍 Restaurant</span></div>
+      </div>
+    </div>
   </div>
 
   <div class="card warning">
     <h3>🟠 COURT TERME — Actions en cours à surveiller</h3>
-    <div id="actionsShort"></div>
+    <div class="action-row">
+      <div class="action-num">1</div>
+      <div class="action-content">
+        <h4>Accompagnement collectifs de travail — Cabinet ARCANOVA (I3R) — 6 000€</h4>
+        <p>Pilote : Caroline De Andrade | Avancement : 10% | Échéance : 27/05/2026</p>
+        <div class="action-meta"><span class="tag complex">Accompagnement requis</span><span class="tag cse">🗣️ Information CSE</span><span class="tag zone">📍 Risques Généraux</span></div>
+      </div>
+    </div>
   </div>
 
   <div class="card ok">
-    <h3>🟢 RECOMMANDATIONS — Améliorations prioritaires non planifiées</h3>
-    <div id="actionsReco"></div>
+    <h3>🟢 RECOMMANDATIONS — Améliorations prioritaires</h3>
+    <div class="action-row">
+      <div class="action-num">1</div>
+      <div class="action-content">
+        <h4>Formation gestes et postures (PRAP)</h4>
+        <p>Nombreuses situations de manutention cotées 6. Formation prioritaire pour réduire TMS et lombalgies.</p>
+        <div class="action-meta"><span class="tag moyen">Prestataire recommandé</span><span class="tag zone">📍 Cuisine, Cafétéria, Économat, Plonge</span></div>
+      </div>
+    </div>
+    <div class="action-row">
+      <div class="action-num">2</div>
+      <div class="action-content">
+        <h4>Formation feu réel &amp; exercice évacuation annuel</h4>
+        <p>Risque incendie coté 8 dans toutes les unités. Exercice feu réel recommandé systématiquement.</p>
+        <div class="action-meta"><span class="tag simple">Action simple</span><span class="tag zone">📍 Toutes unités</span></div>
+      </div>
+    </div>
+    <div class="action-row">
+      <div class="action-num">3</div>
+      <div class="action-content">
+        <h4>Audit ergonomique postes Réception</h4>
+        <p>5 risques documentés : postures écran, station debout, activité téléphonique. Audit pour objectiver les préconisations.</p>
+        <div class="action-meta"><span class="tag moyen">Prestataire recommandé</span><span class="tag zone">📍 Réception</span></div>
+      </div>
+    </div>
+    <div class="action-row">
+      <div class="action-num">4</div>
+      <div class="action-content">
+        <h4>Restitution enquête RPS &amp; suivi indicateurs</h4>
+        <p>Enquête CSE réalisée en jan. 2026. La restitution aux équipes et la mise en place d'indicateurs de suivi sont à planifier.</p>
+        <div class="action-meta"><span class="tag complex">Accompagnement requis</span><span class="tag cse">🗣️ Information CSE</span><span class="tag zone">📍 Risques Généraux</span></div>
+      </div>
+    </div>
+    <div class="action-row">
+      <div class="action-num">5</div>
+      <div class="action-content">
+        <h4>Contrôle annuel APAVE installations électriques</h4>
+        <p>Risque électrique coté 8 en Restaurant et Service Technique. Obligation réglementaire à tracer dans PREVISOFT.</p>
+        <div class="action-meta"><span class="tag moyen">Prestataire recommandé</span><span class="tag zone">📍 Cuisine, Restaurant, Service Technique</span></div>
+      </div>
+    </div>
+    <div class="action-row">
+      <div class="action-num">6</div>
+      <div class="action-content">
+        <h4>Mise à jour fiches EPI par zone de travail</h4>
+        <p>Fiches EPI à afficher dans chaque zone et à maintenir à jour dans PREVISOFT (module Évaluation des risques).</p>
+        <div class="action-meta"><span class="tag simple">Action simple</span><span class="tag zone">📍 Cuisine, Plonge, Service Technique</span></div>
+      </div>
+    </div>
   </div>
 
-  <div style="margin-top:20px;">
+  <div style="margin-top:16px">
     <button class="btn btn-primary" onclick="exportActions()">⬇️ Exporter le plan (texte)</button>
   </div>
-  <div id="exportZone" class="hidden" style="margin-top:16px; background:white; padding:16px; border-radius:10px; font-size:12px; white-space:pre-wrap; font-family:monospace; border:1px solid var(--gray);"></div>
+  <pre id="exportZone" class="hidden" style="margin-top:16px;background:#fff;padding:16px;border-radius:10px;font-size:12px;white-space:pre-wrap;border:1px solid var(--gray)"></pre>
 </div>
 
 <script>
-// ===== DATA FROM DUER =====
-const DUER_DATA = {
-  hotel: "Ibis Marseille Gare Saint-Charles",
-  siret: "40326772700440",
-  lastUpdate: "25/03/2026",
-  units: ["Bar","Bureaux - Secteur Administratif","Cafétéria - PDJ","Cuisine","Économat / Livraison","Entretien chambres","Étages","Lingerie","Parking / Garage","Piscine","Plonge","Risques Généraux","Réception clientèle","Salle de restaurant","Service Technique & Maintenance","Activité forme","Animation"],
-  topRisks: [
-    { unit:"Parking / Garage", risk:"Chute de plain pied (passage étroit)", score:8, type:"Chute" },
-    { unit:"Parking / Garage", risk:"Incendie / Explosion", score:8, type:"Incendie" },
-    { unit:"Bar", risk:"Incendie / Explosion", score:8, type:"Incendie" },
-    { unit:"Cafétéria", risk:"Incendie / Explosion", score:8, type:"Incendie" },
-    { unit:"Cuisine", risk:"Incendie / Explosion", score:8, type:"Incendie" },
-    { unit:"Cuisine", risk:"Brûlure thermique (friteuse, marmites)", score:6, type:"Thermique" },
-    { unit:"Plonge", risk:"Incendie / Explosion", score:8, type:"Incendie" },
-    { unit:"Plonge", risk:"Risque Psychosocial (RPS)", score:8, type:"RPS" },
-    { unit:"Réception", risk:"Incendie / Explosion", score:8, type:"Incendie" },
-    { unit:"Restaurant", risk:"Incendie / Explosion", score:8, type:"Incendie" },
-    { unit:"Restaurant", risk:"Électricité (fils non protégés)", score:8, type:"Électricité" },
-    { unit:"Risques Généraux", risk:"RPS — Dysfonctionnements organisationnels (climat dégradé)", score:8, type:"RPS" },
-    { unit:"Service Technique", risk:"Risque biologique (piqûres/coupures)", score:8, type:"Biologique" },
-    { unit:"Service Technique", risk:"Électricité (intervention circuit)", score:8, type:"Électricité" },
-  ],
-  pendingActions: [
-    { zone:"Bar", task:"Achat chaussures sécurité équipe", pilot:"Régis Koch", due:"31/03/2026", progress:0, cost:200 },
-    { zone:"Réception", task:"Achat chaussures sécurité équipe", pilot:"Régis Koch", due:"31/03/2026", progress:0, cost:400 },
-    { zone:"Restaurant", task:"Achat chaussures sécurité équipe", pilot:"Régis Koch", due:"31/03/2026", progress:0, cost:300 },
-    { zone:"Risques Généraux", task:"Accompagnement collectifs — cabinet ARCANOVA (I3R)", pilot:"Caroline De Andrade", due:"27/05/2026", progress:10, cost:6000 },
-  ],
-  recommendations: [
-    { prio:1, label:"Formation gestes et postures (PRAP)", zones:["Cuisine","Cafétéria","Économat","Plonge"], complexity:"moyen", needCSE:false, detail:"Nombreuses situations de manutention cotées 6. La formation PRAP est une priorité pour réduire les TMS et lombalgies." },
-    { prio:2, label:"Formation feu réel / exercice évacuation", zones:["Toutes unités"], complexity:"simple", needCSE:false, detail:"Le risque incendie (coté 8) est présent dans toutes les unités. Un exercice feu réel annuel est recommandé systématiquement." },
-    { prio:3, label:"Audit ergonomique postes Réception", zones:["Réception"], complexity:"moyen", needCSE:false, detail:"Postures écran, station debout, activité téléphonique : 5 risques documentés. Un audit ergonomique permettrait d'objectiver les préconisations." },
-    { prio:4, label:"Enquête RPS avec restitution aux équipes", zones:["Risques Généraux"], complexity:"complex", needCSE:true, detail:"L'enquête RPS diligentée par le CSE (jan. 2026) doit faire l'objet d'une restitution. L'intervention ARCANOVA doit être suivie d'indicateurs de mesure." },
-    { prio:5, label:"Mise à jour fiches EPI par zone", zones:["Cuisine","Plonge","Service Technique"], complexity:"simple", needCSE:false, detail:"Les fiches EPI par zone de travail doivent être affichées et tenues à jour dans PREVISOFT." },
-    { prio:6, label:"Contrôle annuel APAVE installations électriques", zones:["Cuisine","Restaurant","Réception"], complexity:"moyen", needCSE:false, detail:"Risque électrique coté 8 dans plusieurs unités. Le contrôle annuel APAVE est une obligation réglementaire à tracer dans PREVISOFT." },
-  ]
-};
+const SYSTEM_PROMPT = `Tu es un assistant spécialisé en prévention des risques professionnels en hôtellerie-restauration, qui aide des directeurs d'hôtel à piloter leur DUER dans PREVISOFT.
 
-// ===== SYSTEM PROMPT =====
-const SYSTEM_PROMPT = `Tu es un assistant spécialisé en prévention des risques professionnels en hôtellerie-restauration, qui aide des directeurs d'hôtel à piloter leur DUER (Document Unique d'Évaluation des Risques) dans l'outil PREVISOFT.
+DUER analysé : Ibis Marseille Gare Saint-Charles (SIRET 40326772700440), dernière MAJ 25/03/2026.
+17 unités de travail. Formule cotation PREVISOFT : ((G+F)*M). Seuils : ≥8 prioritaire, 5-7 moyen, <5 faible.
 
-Tu connais en détail le DUER suivant :
-- Établissement : ${DUER_DATA.hotel} (SIRET : ${DUER_DATA.siret})
-- Dernière mise à jour : ${DUER_DATA.lastUpdate}
-- 17 unités de travail analysées : Bar, Bureaux, Cafétéria-PDJ, Cuisine, Économat/Livraison, Entretien chambres, Étages, Lingerie, Parking/Garage, Piscine, Plonge, Risques Généraux, Réception, Restaurant, Service Technique & Maintenance, Activité forme, Animation
-- Formule de cotation PREVISOFT : ((G+F)*M) où G=gravité (1-4), F=fréquence (1-4), M=maîtrise (0, 0.5, 1, 2)
-- Seuils : ≥8 = risque prioritaire (rouge), 5-7 = moyennement prioritaire (orange), <5 = non prioritaire (vert)
-
-RISQUES PRIORITAIRES (score ≥8) identifiés :
-- Risque incendie/explosion coté 8 dans presque toutes les unités (formation feu réel à renforcer)
-- RPS critique (risque n°8, Risques Généraux, coté 8) : dysfonctionnements organisationnels, accompagnement ARCANOVA en cours (10%)
-- Chute de plain pied Parking (passage étroit) : 8
-- Risque biologique Service Technique : 8
-- Électricité Restaurant et Service Technique : 8
+RISQUES PRIORITAIRES (score ≥8) :
+- Incendie/explosion coté 8 dans : Bar, Cafétéria, Cuisine, Économat, Plonge, Réception, Restaurant, Parking, Service Technique
+- RPS Risques Généraux (dysfonctionnements organisationnels) : 8 — accompagnement ARCANOVA en cours (10%)
 - RPS Plonge : 8
+- Chute plain pied Parking (passage étroit) : 8
+- Électricité Restaurant : 8 | Service Technique : 8
+- Risque biologique Service Technique : 8
 
 ACTIONS EN COURS :
-- 3 achats chaussures sécurité (Bar/Réception/Restaurant) : 0% d'avancement, échéance 31/03/2026 dépassée, pilote Régis Koch
+- 3 achats chaussures sécurité (Bar/Réception/Restaurant) : 0%, échéance 31/03/2026 dépassée, pilote Régis Koch
 - Accompagnement RPS ARCANOVA : 10%, échéance 27/05/2026, pilote Caroline De Andrade
-- Enquête RPS CSE (jan. 2026) : 100%, restitution prévue fin février
 
-CONTEXTE PREVISOFT :
-- L'arbre des entités structure toutes les données : Essendi > IBIS > H1390 Marseille Gare Saint-Charles
-- Chaque risque est rattaché à une unité de travail (entité de rattachement)
-- Le DUER est le document déclaratif lié à l'entité déclarante (SIRET)
-- Pour mettre à jour un risque : aller dans le module Évaluation des risques > sélectionner l'entité > modifier la cotation ou les mesures > valider
+PREVISOFT — navigation clé :
+- Arbre des entités : Essendi > IBIS > H1390 Marseille Gare Saint-Charles
+- MAJ risque : Évaluation des risques > sélectionner entité > modifier cotation/mesures > valider
+- Plans d'action : module Plans d'action > filtrer par entité
+- AT/MP : module AT/MP > Nouvel accident > DAT
 
-Contexte sectoriel hôtellerie-restauration :
-- Risques dominants : TMS, chutes de plain pied, risque chimique (produits ménagers), incendie, RPS (charge de travail, horaires atypiques, relation client)
-- Obligations légales : DUER obligatoire pour toute entreprise (art. R.4121-1 CT), mise à jour annuelle ou après événement déclencheur, après AT grave, ou modification significative des conditions de travail
-- La non-mise à jour du DUER est sanctionnable (contravention de 5ème classe pour les entreprises de 11 salariés et plus)
+OBLIGATIONS LÉGALES clés :
+- DUER obligatoire (art. R.4121-1 CT), MAJ annuelle minimum
+- Non-MAJ : contravention 5e classe (entreprises ≥11 salariés)
+- Actions correctives après AT grave : obligation immédiate
 
-INSTRUCTIONS :
-- Réponds en français, de façon claire, concise et pratique
-- Adapte le niveau de détail au profil d'un directeur d'hôtel non-expert RH
-- Quand tu donnes des conseils PREVISOFT, sois précis sur les menus et les étapes
-- Pour les risques légaux, rappelle les textes applicables simplement sans jargon excessif
-- Propose toujours une action concrète à la fin de ta réponse
-- Limite tes réponses à 200 mots maximum pour rester lisible sur l'interface`;
+Réponds en français, de façon concise et pratique, max 200 mots, avec une action concrète en fin de réponse.`;
 
-// ===== TABS =====
+const chatHistory = [];
+
 function showTab(name) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById('panel-' + name).classList.add('active');
-  event && event.target && event.target.classList.add('active');
-  // fix tab highlight
-  document.querySelectorAll('.tab').forEach(t => {
-    if (t.textContent.toLowerCase().includes(name.substring(0,4))) t.classList.add('active');
-  });
+  document.getElementById('t-' + name).classList.add('active');
 }
 
-// ===== LOAD DEMO =====
 function loadDemo() {
   document.getElementById('loadingMsg').classList.remove('hidden');
   setTimeout(() => {
     document.getElementById('loadingMsg').classList.add('hidden');
-    populateAnalysis();
-    populateActions();
     showTab('analyse');
-  }, 1800);
+  }, 1600);
 }
 
 function handleFile(e) {
   const f = e.target.files[0];
   if (!f) return;
-  document.getElementById('uploadZone').innerHTML = `<div class="icon">✅</div><h3>${f.name}</h3><p>Fichier chargé — analyse en cours...</p>`;
+  document.getElementById('uploadZone').innerHTML = `<div class="icon">✅</div><h3>${f.name}</h3><p>Fichier chargé</p>`;
   document.getElementById('loadingMsg').classList.remove('hidden');
   setTimeout(() => {
     document.getElementById('loadingMsg').classList.add('hidden');
-    populateAnalysis();
-    populateActions();
     showTab('analyse');
-  }, 2200);
+  }, 2000);
 }
-
-// ===== POPULATE ANALYSIS =====
-function populateAnalysis() {
-  const tbody = document.getElementById('riskTableBody');
-  tbody.innerHTML = '';
-  DUER_DATA.topRisks.forEach(r => {
-    const cls = r.score >= 8 ? 's-high' : r.score >= 5 ? 's-med' : 's-low';
-    const badge = r.score >= 8 ? '<span class="badge high">Prioritaire</span>' : '<span class="badge med">Moyen</span>';
-    tbody.innerHTML += `<tr>
-      <td><strong>${r.unit}</strong></td>
-      <td>${r.risk}</td>
-      <td><span class="score ${cls}">${r.score}</span></td>
-      <td>${badge}</td>
-      <td style="font-size:12px; color:var(--muted)">Voir plan d'actions</td>
-    </tr>`;
-  });
-
-  // Famille de risques
-  const families = {};
-  DUER_DATA.topRisks.forEach(r => {
-    if (!families[r.type]) families[r.type] = [];
-    families[r.type].push(r);
-  });
-  const icons = { Incendie:"🔥", RPS:"🧠", Chute:"⚠️", TMS:"💪", Électricité:"⚡", Biologique:"🦠", Thermique:"🌡️" };
-  const rf = document.getElementById('riskFamilies');
-  rf.innerHTML = '';
-  Object.entries(families).forEach(([type, risks]) => {
-    const maxScore = Math.max(...risks.map(r => r.score));
-    const barCls = maxScore >= 8 ? 'danger' : maxScore >= 5 ? 'warn' : '';
-    rf.innerHTML += `<div style="margin-bottom:10px;">
-      <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:3px;">
-        <span>${icons[type]||'•'} <strong>${type}</strong> — ${risks.length} situation(s) documentée(s)</span>
-        <span class="badge ${maxScore>=8?'high':maxScore>=5?'med':'low'}">max ${maxScore}</span>
-      </div>
-      <div class="progress-bar-wrap"><div class="progress-bar ${barCls}" style="width:${(maxScore/10)*100}%"></div></div>
-    </div>`;
-  });
-}
-
-// ===== POPULATE ACTIONS =====
-function populateActions() {
-  const imm = document.getElementById('actionsImmediat');
-  const sht = document.getElementById('actionsShort');
-  const rco = document.getElementById('actionsReco');
-  imm.innerHTML = ''; sht.innerHTML = ''; rco.innerHTML = '';
-
-  // Immediate (0% / retard)
-  const overdue = DUER_DATA.pendingActions.filter(a => a.progress === 0);
-  overdue.forEach((a, i) => {
-    imm.innerHTML += actionRow(i+1, a.task, a.zone, `Pilote : ${a.pilot} | Échéance : ${a.due} | Budget : ${a.cost}€`, 'simple', false);
-  });
-
-  // Short (en cours)
-  const inprog = DUER_DATA.pendingActions.filter(a => a.progress > 0 && a.progress < 100);
-  inprog.forEach((a, i) => {
-    sht.innerHTML += actionRow(i+1, a.task, a.zone, `Pilote : ${a.pilot} | Avancement : ${a.progress}% | Échéance : ${a.due}`, 'moyen', a.needCSE||false);
-  });
-
-  // Reco
-  DUER_DATA.recommendations.forEach((r, i) => {
-    rco.innerHTML += actionRow(i+1, r.label, r.zones.join(', '), r.detail, r.complexity, r.needCSE);
-  });
-}
-
-function actionRow(n, title, zone, detail, complexity, needCSE) {
-  const cLabel = { simple:'Action simple', moyen:'Prestataire recommandé', complex:'Accompagnement requis' };
-  return `<div class="action-row">
-    <div class="action-num">${n}</div>
-    <div class="action-content" style="flex:1">
-      <h4>${title}</h4>
-      <p>${detail}</p>
-      <div class="action-meta">
-        <span class="tag ${complexity}">${cLabel[complexity]}</span>
-        <span class="tag zone">📍 ${zone}</span>
-        ${needCSE ? '<span class="tag cse">🗣️ Information CSE</span>' : ''}
-      </div>
-    </div>
-  </div>`;
-}
-
-// ===== EXPORT =====
-function exportActions() {
-  const lines = [`PLAN D'ACTIONS DUER — ${DUER_DATA.hotel}`, `Date : ${new Date().toLocaleDateString('fr-FR')}`, ``, `=== ACTIONS IMMÉDIATES ===`];
-  DUER_DATA.pendingActions.filter(a => a.progress===0).forEach((a,i) => {
-    lines.push(`${i+1}. ${a.task} [${a.zone}] — Pilote : ${a.pilot} — Échéance : ${a.due} — Budget : ${a.cost}€`);
-  });
-  lines.push(``, `=== EN COURS ===`);
-  DUER_DATA.pendingActions.filter(a => a.progress>0 && a.progress<100).forEach((a,i) => {
-    lines.push(`${i+1}. ${a.task} [${a.zone}] — ${a.progress}% — Pilote : ${a.pilot}`);
-  });
-  lines.push(``, `=== RECOMMANDATIONS ===`);
-  DUER_DATA.recommendations.forEach((r,i) => {
-    lines.push(`${i+1}. ${r.label} [${r.zones.join(', ')}]`);
-    lines.push(`   → ${r.detail}`);
-  });
-  const ez = document.getElementById('exportZone');
-  ez.classList.remove('hidden');
-  ez.textContent = lines.join('\n');
-  ez.select && ez.select();
-}
-
-// ===== CHAT =====
-const chatHistory = [];
 
 function sendChip(el) {
   document.getElementById('chatInput').value = el.textContent;
@@ -561,16 +381,13 @@ async function sendMessage() {
   const msg = input.value.trim();
   if (!msg) return;
   input.value = '';
-
   addMsg('user', msg);
-  chatHistory.push({ role:'user', content: msg });
-
+  chatHistory.push({ role: 'user', content: msg });
   const btn = document.getElementById('sendBtn');
   btn.disabled = true;
-  const typing = addMsg('assistant', '<span class="typing"><span class="spinner"></span> L\'assistant réfléchit...</span>');
-
+  const typing = addMsg('assistant', '<span class="spinner"></span> L\'assistant réfléchit...');
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch('/api/claude', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -581,42 +398,47 @@ async function sendMessage() {
       })
     });
     const data = await res.json();
-    const reply = data.content?.[0]?.text || 'Désolé, je n\'ai pas pu générer une réponse.';
-    chatHistory.push({ role:'assistant', content: reply });
-    typing.innerHTML = formatReply(reply);
+    const reply = data.content?.[0]?.text || 'Désolé, réponse indisponible.';
+    chatHistory.push({ role: 'assistant', content: reply });
+    typing.innerHTML = reply.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
   } catch(e) {
-    typing.innerHTML = '⚠️ Erreur de connexion. Vérifiez votre réseau.';
+    typing.innerHTML = '⚠️ Erreur de connexion.';
   }
   btn.disabled = false;
-  document.getElementById('chatMessages').scrollTop = 9999;
+  document.getElementById('chatMessages').scrollTop = 99999;
 }
 
 function addMsg(role, html) {
   const div = document.createElement('div');
-  div.className = `msg ${role}`;
+  div.className = 'msg ' + role;
   div.innerHTML = html;
   document.getElementById('chatMessages').appendChild(div);
-  document.getElementById('chatMessages').scrollTop = 9999;
+  document.getElementById('chatMessages').scrollTop = 99999;
   return div;
 }
 
-function formatReply(text) {
-  return text
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\n\n/g, '<br><br>')
-    .replace(/\n/g, '<br>')
-    .replace(/- (.*?)(<br>|$)/g, '• $1$2');
-}
+function exportActions() {
+  const txt = `PLAN D'ACTIONS DUER — Ibis Marseille Gare Saint-Charles
+Date : ${new Date().toLocaleDateString('fr-FR')}
 
-// Init — attendre que le DOM soit prêt
-document.addEventListener('DOMContentLoaded', () => {
-  populateAnalysis();
-  populateActions();
-});
-// Fallback si DOMContentLoaded déjà passé
-if (document.readyState === 'complete' || document.readyState === 'interactive') {
-  populateAnalysis();
-  populateActions();
+=== IMMÉDIAT (en retard) ===
+1. Achat chaussures sécurité Bar (200€) — Régis Koch — 31/03/2026 — 0%
+2. Achat chaussures sécurité Réception (400€) — Régis Koch — 31/03/2026 — 0%
+3. Achat chaussures sécurité Restaurant (300€) — Régis Koch — 31/03/2026 — 0%
+
+=== COURT TERME ===
+1. Accompagnement ARCANOVA/I3R RPS (6000€) — Caroline De Andrade — 27/05/2026 — 10%
+
+=== RECOMMANDATIONS ===
+1. Formation PRAP gestes et postures [Cuisine, Cafétéria, Économat, Plonge]
+2. Formation feu réel + exercice évacuation annuel [Toutes unités]
+3. Audit ergonomique postes Réception
+4. Restitution enquête RPS + indicateurs de suivi [avec CSE]
+5. Contrôle annuel APAVE électricité [Cuisine, Restaurant, Service Technique]
+6. Fiches EPI par zone dans PREVISOFT [Cuisine, Plonge, Service Technique]`;
+  const ez = document.getElementById('exportZone');
+  ez.classList.remove('hidden');
+  ez.textContent = txt;
 }
 </script>
 </body>
